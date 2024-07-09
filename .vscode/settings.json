@@ -1,4 +1,0 @@
-{
-    "lldb.library": "/home/swift/usr/lib/liblldb.so",
-    "lldb.launch.expressions": "native"
-}
