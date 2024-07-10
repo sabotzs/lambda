@@ -2,6 +2,7 @@
 /.build
 /.vscode
 /Packages
+Package.resolved
 xcuserdata/
 DerivedData/
 .swiftpm/configuration/registries.json
