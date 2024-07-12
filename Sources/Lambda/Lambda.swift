@@ -1,6 +1,9 @@
 //
 // Lambda.swift
-// Georgi Kuklev on 12.07.2024
+// Lambda
+//
+// Created by sabotzs on 12.07.2024
+//
 
 class Lambda {
     let lambda: LambdaExpression

@@ -1,6 +1,9 @@
 //
 // LambdaExpression.swift
-// Georgi Kuklev on 12.07.2024
+// Lambda
+//
+// Created by sabotzs on 12.07.2024
+//
 
 enum LambdaExpression {
     case variable(name: String)
