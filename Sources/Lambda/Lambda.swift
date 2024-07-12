@@ -8,10 +8,7 @@
 class Lambda {
     let lambda: LambdaExpression
     private(set) lazy var freeVariables: Set<String> = {
-        var all: Set<String> = []
-        var bound: Set<String> = []
-        getVariables(lambda: lambda, all: &all, bound: &bound)
-        return all.subtracting(bound)
+        getFreeVariables(lambda: lambda, free: [], bound: [])
     }()
 
     init(_ lambda: LambdaExpression) {
@@ -36,6 +33,38 @@ extension Lambda {
         case let .application(function, argument):
             getVariables(lambda: function, all: &all, bound: &bound)
             getVariables(lambda: argument, all: &all, bound: &bound)
+        }
+    }
+
+    private func getFreeVariables(
+        lambda: LambdaExpression,
+        free: Set<String>,
+        bound: Set<String>
+    ) -> Set<String> {
+        switch lambda {
+        case let .variable(name):
+            if !bound.contains(name) {
+                return free.union([name])
+            }
+            return free
+        case let .abstraction(variable, body):
+            return getFreeVariables(
+                lambda: body,
+                free: free,
+                bound: bound.union([variable])
+            )
+        case let .application(function, argument):
+            let functionFreeVariables = getFreeVariables(
+                lambda: function,
+                free: free,
+                bound: bound
+            )
+            let argumentFreeVariables = getFreeVariables(
+                lambda: argument,
+                free: free,
+                bound: bound
+            )
+            return functionFreeVariables.union(argumentFreeVariables)
         }
     }
 }

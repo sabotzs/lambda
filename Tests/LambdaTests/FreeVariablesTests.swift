@@ -9,7 +9,7 @@ import XCTest
 @testable import Lambda
 
 final class FreeVariablesTests: XCTestCase {
-    func testVariableExpressionIsFreeVariable() {
+    func testSingleVariableIsFree() {
         let name = "x"
         let expression: LambdaExpression = .variable(name: name)
         let lambda = Lambda(expression)
@@ -21,7 +21,10 @@ final class FreeVariablesTests: XCTestCase {
 
     func testAbstractionOnVariableWithSameNameHasNoFreeVariables() {
         let name = "x"
-        let expression: LambdaExpression = .abstraction(variable: name, body: .variable(name: name))
+        let expression: LambdaExpression = .abstraction(
+            variable: name,
+            body: .variable(name: name)
+        )
         let lambda = Lambda(expression)
 
         let expected: Set<String> = []
@@ -32,7 +35,10 @@ final class FreeVariablesTests: XCTestCase {
     func testAbstractionOnVariableWithDifferentHasFreeVariable() {
         let bound = "x"
         let free = "y"
-        let expression: LambdaExpression = .abstraction(variable: bound, body: .variable(name: free))
+        let expression: LambdaExpression = .abstraction(
+            variable: bound,
+            body: .variable(name: free)
+        )
         let lambda = Lambda(expression)
 
         let expected: Set<String> = [free]
@@ -43,9 +49,10 @@ final class FreeVariablesTests: XCTestCase {
     func testApplicationFreeVariablesIsUnionOfFunctionAndArgumentFreeVariables() {
         let bound = "x"
         let free = "y"
-        let function: LambdaExpression = .abstraction(variable: bound, body: .variable(name: bound))
-        let argument: LambdaExpression = .variable(name: free)
-        let expression: LambdaExpression = .application(function: function, argument: argument)
+        let expression: LambdaExpression = .application(
+            function: .abstraction(variable: bound, body: .variable(name: bound)),
+            argument: .variable(name: free)
+        )
         let lambda = Lambda(expression)
 
         let expected: Set<String> = [free]
@@ -54,14 +61,26 @@ final class FreeVariablesTests: XCTestCase {
     }
 
     func testFreeVariableInFunctionAndArgumentIsFreeInApplication() {
-        let bound = "x"
-        let free = "y"
-        let function: LambdaExpression = .abstraction(variable: bound, body: .variable(name: free))
-        let argument: LambdaExpression = .variable(name: free)
-        let expression: LambdaExpression = .application(function: function, argument: argument)
+        let expression: LambdaExpression = .application(
+            function: .abstraction(variable: "x", body: .variable(name: "y")),
+            argument: .variable(name: "z")
+        )
         let lambda = Lambda(expression)
 
-        let expected: Set<String> = [free]
+        let expected: Set<String> = ["y", "z"]
+
+        XCTAssertEqual(lambda.freeVariables, expected)
+    }
+
+    func testNameShadowingFreeVariableReturnsTheVariable() {
+        let name = "x"
+        let expression: LambdaExpression = .application(
+            function: .abstraction(variable: name, body: .variable(name: name)),
+            argument: .variable(name: name)
+        )
+        let lambda = Lambda(expression)
+
+        let expected: Set<String> = [name]
 
         XCTAssertEqual(lambda.freeVariables, expected)
     }
