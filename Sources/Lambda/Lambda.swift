@@ -16,8 +16,8 @@ class Lambda {
         }
         return [String: UInt](uniqueKeysWithValues: indices)
     }()
-    private(set) lazy var deBrujinIndex: DeBrujinIndex = {
-        getDeBrujinIndex(
+    private(set) lazy var deBruijnIndex: DeBruijnIndex = {
+        getDeBruijnIndex(
             lambda: lambda,
             bound: [],
             boundVariablesIndices: [:],
@@ -67,12 +67,12 @@ extension Lambda {
 
 // MARK: de Brujin index
 extension Lambda {
-    private func getDeBrujinIndex(
+    private func getDeBruijnIndex(
         lambda: LambdaExpression,
         bound: Set<String>,
         boundVariablesIndices: [String: UInt],
         freeVariablesIndices: [String: UInt]
-    ) -> DeBrujinIndex {
+    ) -> DeBruijnIndex {
         switch lambda {
         case let .variable(name):
             let index = if bound.contains(name) {
@@ -85,7 +85,7 @@ extension Lambda {
             var newBoundVariablesIndices = boundVariablesIndices.mapValues { $0 + 1 }
             newBoundVariablesIndices[variable] = 0
             let newFreeVariablesIndices = freeVariablesIndices.mapValues { $0 + 1 }
-            let index = getDeBrujinIndex(
+            let index = getDeBruijnIndex(
                 lambda: body,
                 bound: bound.union([variable]),
                 boundVariablesIndices: newBoundVariablesIndices,
@@ -93,13 +93,13 @@ extension Lambda {
             )
             return .abstraction(body: index)
         case let .application(function, argument):
-            let functionIndex = getDeBrujinIndex(
+            let functionIndex = getDeBruijnIndex(
                 lambda: function,
                 bound: bound,
                 boundVariablesIndices: boundVariablesIndices,
                 freeVariablesIndices: freeVariablesIndices
             )
-            let argumentIndex = getDeBrujinIndex(
+            let argumentIndex = getDeBruijnIndex(
                 lambda: argument,
                 bound: bound,
                 boundVariablesIndices: boundVariablesIndices,

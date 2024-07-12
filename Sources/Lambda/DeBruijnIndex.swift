@@ -1,17 +1,17 @@
 //
-// DeBrujinIndex.swift
+// DeBruijnIndex.swift
 // Lambda
 //
 // Created by sabotzs on 12.07.2024
 //
 
-enum DeBrujinIndex {
+enum DeBruijnIndex {
     case variable(index: UInt)
-    indirect case abstraction(body: DeBrujinIndex)
-    indirect case application(function: DeBrujinIndex, argument: DeBrujinIndex)
+    indirect case abstraction(body: DeBruijnIndex)
+    indirect case application(function: DeBruijnIndex, argument: DeBruijnIndex)
 }
 
-extension DeBrujinIndex: Equatable {
+extension DeBruijnIndex: Equatable {
     static func == (_ lhs: Self, _ rhs: Self) -> Bool {
         switch (lhs, rhs) {
         case let (.variable(lIndex), .variable(rIndex)):

@@ -8,14 +8,14 @@
 import XCTest
 @testable import Lambda
 
-class DeBrujinIndexTests: XCTestCase {
+class DeBruijnIndexTests: XCTestCase {
     func testIndexOfSingleVariable() {
         let expression: LambdaExpression = .variable(name: "x")
         let lambda = Lambda(expression)
 
-        let expected: DeBrujinIndex = .variable(index: 0)
+        let expected: DeBruijnIndex = .variable(index: 0)
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 
     func testIndexOfSingleAbstraction() {
@@ -26,9 +26,9 @@ class DeBrujinIndexTests: XCTestCase {
         )
         let lambda = Lambda(expression)
 
-        let expected: DeBrujinIndex = .abstraction(body: .variable(index: 0))
+        let expected: DeBruijnIndex = .abstraction(body: .variable(index: 0))
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 
     func testIndexOfSingleApplication() {
@@ -39,12 +39,12 @@ class DeBrujinIndexTests: XCTestCase {
         )
         let lambda = Lambda(expression)
 
-        let expected: DeBrujinIndex = .application(
+        let expected: DeBruijnIndex = .application(
             function: .abstraction(body: .variable(index: 0)),
             argument: .abstraction(body: .variable(index: 0))
         )
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 
     func testIndexOfBoundIncreasesInDeeperAbstraction() {
@@ -61,7 +61,7 @@ class DeBrujinIndexTests: XCTestCase {
         )
         let lambda = Lambda(expression)
 
-        let expected: DeBrujinIndex = .abstraction(
+        let expected: DeBruijnIndex = .abstraction(
             body: .abstraction(
                 body: .abstraction(
                     body: .variable(index: 2)
@@ -69,7 +69,7 @@ class DeBrujinIndexTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 
     func testIndexOfFreeVariables() {
@@ -80,12 +80,12 @@ class DeBrujinIndexTests: XCTestCase {
         let lambda = Lambda(expression)
         let indices = lambda.freeVariablesIndices
 
-        let expected: DeBrujinIndex = .application(
+        let expected: DeBruijnIndex = .application(
             function: .variable(index: indices["x"]!),
             argument: .variable(index: indices["y"]!)
         )
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 
     func testIndexWithVariableBothFreeAndBound() {
@@ -96,12 +96,12 @@ class DeBrujinIndexTests: XCTestCase {
         )
         let lambda = Lambda(expression)
 
-        let expected: DeBrujinIndex = .application(
+        let expected: DeBruijnIndex = .application(
             function: .abstraction(body: .variable(index: 0)),
             argument: .variable(index: 0)
         )
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 
     func testAdvancedExpression() {
@@ -127,7 +127,7 @@ class DeBrujinIndexTests: XCTestCase {
         // If free indices are ["a": 0, "y": 1] then \(0(\02)0)2
         // If free indices are ["a": 1, "y": 0] then \(0(\03)0)1
         // In both cases is valid index of the expression
-        let expected: DeBrujinIndex = .abstraction(
+        let expected: DeBruijnIndex = .abstraction(
             body: .application(
                 function: .application(
                     function: .application(
@@ -145,6 +145,6 @@ class DeBrujinIndexTests: XCTestCase {
             )
         )
 
-        XCTAssertEqual(lambda.deBrujinIndex, expected)
+        XCTAssertEqual(lambda.deBruijnIndex, expected)
     }
 }
