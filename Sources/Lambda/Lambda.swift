@@ -10,67 +10,11 @@ class Lambda {
     private(set) lazy var freeVariables: Set<String> = {
         lambda.freeVariables
     }()
-    private(set) lazy var freeVariablesIndices: [String: UInt] = {
-        let indices = freeVariables.enumerated().map { pair in
-            (pair.element, UInt(bitPattern: pair.offset))
-        }
-        return [String: UInt](uniqueKeysWithValues: indices)
-    }()
     private(set) lazy var deBruijnIndex: DeBruijnIndex = {
-        getDeBruijnIndex(
-            lambda: lambda,
-            bound: [],
-            boundVariablesIndices: [:],
-            freeVariablesIndices: freeVariablesIndices
-        )
+        lambda.deBruijnIndex
     }()
 
     init(_ lambda: LambdaExpression) {
         self.lambda = lambda
-    }
-}
-
-// MARK: de Brujin index
-extension Lambda {
-    private func getDeBruijnIndex(
-        lambda: LambdaExpression,
-        bound: Set<String>,
-        boundVariablesIndices: [String: UInt],
-        freeVariablesIndices: [String: UInt]
-    ) -> DeBruijnIndex {
-        switch lambda {
-        case let .variable(name):
-            let index = if bound.contains(name) {
-                boundVariablesIndices[name]!
-            } else {
-                freeVariablesIndices[name]!
-            }
-            return .variable(index: index)
-        case let .abstraction(variable, body):
-            var newBoundVariablesIndices = boundVariablesIndices.mapValues { $0 + 1 }
-            newBoundVariablesIndices[variable] = 0
-            let newFreeVariablesIndices = freeVariablesIndices.mapValues { $0 + 1 }
-            let index = getDeBruijnIndex(
-                lambda: body,
-                bound: bound.union([variable]),
-                boundVariablesIndices: newBoundVariablesIndices,
-                freeVariablesIndices: newFreeVariablesIndices
-            )
-            return .abstraction(body: index)
-        case let .application(function, argument):
-            let functionIndex = getDeBruijnIndex(
-                lambda: function,
-                bound: bound,
-                boundVariablesIndices: boundVariablesIndices,
-                freeVariablesIndices: freeVariablesIndices
-            )
-            let argumentIndex = getDeBruijnIndex(
-                lambda: argument,
-                bound: bound,
-                boundVariablesIndices: boundVariablesIndices,
-                freeVariablesIndices: freeVariablesIndices
-            )
-            return .application(function: functionIndex, argument: argumentIndex)
-        }
     }
 }
