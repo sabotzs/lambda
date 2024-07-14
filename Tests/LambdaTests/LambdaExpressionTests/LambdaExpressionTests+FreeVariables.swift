@@ -1,5 +1,5 @@
 //
-// FreeVariablesTests.swift
+// LambdaExpressionTests+FreeVariables.swift
 // LambdaTests
 //
 // Create by Georgi Kuklev on 12.07.2024
@@ -8,15 +8,14 @@
 import XCTest
 @testable import Lambda
 
-final class FreeVariablesTests: XCTestCase {
+final class LambdaExpressionFreeVariablesTests: XCTestCase {
     func testSingleVariableIsFree() {
         let name = "x"
         let expression: LambdaExpression = .variable(name: name)
-        let lambda = Lambda(expression)
 
         let expected: Set<String> = [name]
 
-        XCTAssertEqual(lambda.freeVariables, expected)
+        XCTAssertEqual(expression.freeVariables, expected)
     }
 
     func testAbstractionOnVariableWithSameNameHasNoFreeVariables() {
@@ -25,11 +24,10 @@ final class FreeVariablesTests: XCTestCase {
             variable: name,
             body: .variable(name: name)
         )
-        let lambda = Lambda(expression)
 
         let expected: Set<String> = []
 
-        XCTAssertEqual(lambda.freeVariables, expected)
+        XCTAssertEqual(expression.freeVariables, expected)
     }
 
     func testAbstractionOnVariableWithDifferentHasFreeVariable() {
@@ -39,11 +37,10 @@ final class FreeVariablesTests: XCTestCase {
             variable: bound,
             body: .variable(name: free)
         )
-        let lambda = Lambda(expression)
 
         let expected: Set<String> = [free]
 
-        XCTAssertEqual(lambda.freeVariables, expected)
+        XCTAssertEqual(expression.freeVariables, expected)
     }
 
     func testApplicationFreeVariablesIsUnionOfFunctionAndArgumentFreeVariables() {
@@ -53,11 +50,10 @@ final class FreeVariablesTests: XCTestCase {
             function: .abstraction(variable: bound, body: .variable(name: bound)),
             argument: .variable(name: free)
         )
-        let lambda = Lambda(expression)
 
         let expected: Set<String> = [free]
 
-        XCTAssertEqual(lambda.freeVariables, expected)
+        XCTAssertEqual(expression.freeVariables, expected)
     }
 
     func testFreeVariableInFunctionAndArgumentIsFreeInApplication() {
@@ -65,11 +61,10 @@ final class FreeVariablesTests: XCTestCase {
             function: .abstraction(variable: "x", body: .variable(name: "y")),
             argument: .variable(name: "z")
         )
-        let lambda = Lambda(expression)
 
         let expected: Set<String> = ["y", "z"]
 
-        XCTAssertEqual(lambda.freeVariables, expected)
+        XCTAssertEqual(expression.freeVariables, expected)
     }
 
     func testNameShadowingFreeVariableReturnsTheVariable() {
@@ -78,10 +73,9 @@ final class FreeVariablesTests: XCTestCase {
             function: .abstraction(variable: name, body: .variable(name: name)),
             argument: .variable(name: name)
         )
-        let lambda = Lambda(expression)
 
         let expected: Set<String> = [name]
 
-        XCTAssertEqual(lambda.freeVariables, expected)
+        XCTAssertEqual(expression.freeVariables, expected)
     }
 }
