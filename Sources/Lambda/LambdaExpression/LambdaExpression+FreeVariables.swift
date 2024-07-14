@@ -10,13 +10,6 @@ extension LambdaExpression {
         getFreeVariables(lambda: self, free: [], bound: [])
     }
 
-    var freeVariablesIndices: [String: UInt] {
-        let indices = freeVariables.enumerated().map { pair in
-            (pair.element, UInt(bitPattern: pair.offset))
-        }
-        return [String: UInt](uniqueKeysWithValues: indices)
-    }
-
     private func getFreeVariables(
         lambda: LambdaExpression,
         free: Set<String>,
